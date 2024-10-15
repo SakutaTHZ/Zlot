@@ -23,9 +23,11 @@ const Reel = ({ saveHistory }) => {
 
   // Function to regenerate symbols and trigger animation
   const regenerateSymbols = () => {
+    if (isAnimating) return;  // Prevent any actions during animation
+
     setIsAnimating(false);  // Reset animation state first
     const newSymbols = randomizeSymbols();  // Generate new symbols
-    console.log(newSymbols)
+    console.log(newSymbols);
     setReels(newSymbols);
 
     // Trigger animation after a short delay
@@ -33,12 +35,12 @@ const Reel = ({ saveHistory }) => {
       setIsAnimating(true);  // Start animation
     }, 50);  // Small delay to reset animation state
 
-    // End animation and save to history after 3 seconds
+    // End animation and save to history after 2.5 seconds
     setTimeout(() => {
       setIsAnimating(false); // Stop animation
       saveHistory(newSymbols); // Save the current symbols to history
     }, 2500);  // Duration of the animation
-    console.log(newSymbols)
+    console.log(newSymbols);
   };
 
   // Listen for Spacebar press
@@ -46,7 +48,7 @@ const Reel = ({ saveHistory }) => {
     const handleKeyDown = (event) => {
       if (event.code === "Space") {
         event.preventDefault();  // Prevent default Spacebar behavior (like scrolling)
-        regenerateSymbols();
+        regenerateSymbols();      // Regenerate symbols when Spacebar is pressed
       }
     };
 
@@ -56,7 +58,7 @@ const Reel = ({ saveHistory }) => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [isAnimating]);  // Depend on isAnimating to lock actions
 
   return (
     <div className="reel">
@@ -64,7 +66,7 @@ const Reel = ({ saveHistory }) => {
         <div className="col" key={colIndex}>
           <div
             className={`colData ${isAnimating ? "animating" : ""}`}  // Add animation class when animating
-            style={{ animationDelay: `${colIndex * 0.5}s` }}
+            style={{ animationDelay: `${colIndex * 0.2}s` }}
           >
             {colSymbols.map((symbol, symbolIndex) => (
               <span key={symbolIndex}>{symbol}</span>

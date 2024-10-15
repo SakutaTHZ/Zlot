@@ -210,9 +210,11 @@
 
 @keyframes rollUp {
   0% {
+    opacity: 1;
     transform: translateY(calc(-90%+15px)); /* Start at the bottom (last symbol) */
   }
   100% {
+    opacity: 0;
     transform: translateY(0); /* End at the first 3 symbols */
   }
 }
