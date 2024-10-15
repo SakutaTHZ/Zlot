@@ -3,9 +3,8 @@ import React, { useState, useEffect } from "react";
 // Function to generate random symbols for the reels
 const randomizeSymbols = () => {
   const symbols = ["🍒", "🍋", "🍇", "🔔", "⭐", "🍀"];
-
+  
   return Array.from({ length: 5 }, () => {
-    // 5 columns (reels)
     const dummySymbols = Array.from(
       { length: 25 },
       () => symbols[Math.floor(Math.random() * symbols.length)]
@@ -14,26 +13,59 @@ const randomizeSymbols = () => {
       { length: 3 },
       () => symbols[Math.floor(Math.random() * symbols.length)]
     ); // 3 final symbols
-    console.log(finalSymbols);
-    return [...finalSymbols, ...dummySymbols]; // Combine dummy and final symbols
+    return [...finalSymbols, ...dummySymbols]; // Combine final and dummy symbols
   });
 };
 
-const Reel = () => {
-  const [reels, setReels] = useState([]);
+const Reel = ({ saveHistory }) => {
+  const [reels, setReels] = useState(randomizeSymbols());
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  // Use useEffect to set the random symbols when the component mounts
+  // Function to regenerate symbols and trigger animation
+  const regenerateSymbols = () => {
+    setIsAnimating(false);  // Reset animation state first
+    const newSymbols = randomizeSymbols();  // Generate new symbols
+    console.log(newSymbols)
+    setReels(newSymbols);
+
+    // Trigger animation after a short delay
+    setTimeout(() => {
+      setIsAnimating(true);  // Start animation
+    }, 50);  // Small delay to reset animation state
+
+    // End animation and save to history after 3 seconds
+    setTimeout(() => {
+      setIsAnimating(false); // Stop animation
+      saveHistory(newSymbols); // Save the current symbols to history
+    }, 2500);  // Duration of the animation
+    console.log(newSymbols)
+  };
+
+  // Listen for Spacebar press
   useEffect(() => {
-    const symbols = randomizeSymbols();
-    setReels(symbols);
+    const handleKeyDown = (event) => {
+      if (event.code === "Space") {
+        event.preventDefault();  // Prevent default Spacebar behavior (like scrolling)
+        regenerateSymbols();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Cleanup event listener on unmount
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   return (
     <div className="reel">
       {reels.map((colSymbols, colIndex) => (
         <div className="col" key={colIndex}>
-          <div className="colData"
-            style={{ animationDelay: `${colIndex * 0.5}s` }}>
+          <div
+            className={`colData ${isAnimating ? "animating" : ""}`}  // Add animation class when animating
+            style={{ animationDelay: `${colIndex * 0.5}s` }}
+          >
             {colSymbols.map((symbol, symbolIndex) => (
               <span key={symbolIndex}>{symbol}</span>
             ))}
