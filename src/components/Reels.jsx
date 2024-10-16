@@ -133,7 +133,7 @@ const getCurrentTime = () => {
 };
 
 //Pity count
-const pityThreshold = 3;
+const pityThreshold = 30;
 // Function to generate random symbols for the reels
 const randomizeSymbols = (failCount) => {
   const symbols = ["🍒", "🍋", "🍇", "🔔", "⭐", "🍀"];
