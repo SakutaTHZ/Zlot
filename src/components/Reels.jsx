@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import ReelGrid from "./ReelGrid";
+import { PiCurrencyDollarSimpleBold } from "react-icons/pi";
 
 // Define custom paylines (indices of symbols in the paylines)
 const PAYLINES = [
@@ -206,6 +207,7 @@ const checkWinCondition = (reels) => {
 };
 
 const Reel = ({ saveHistory }) => {
+  const [money,setMoney] = useState(10000);
   const [failCount,setFailCount] = useState(1);
   const [reels, setReels] = useState(randomizeSymbols(failCount));
   const [isAnimating, setIsAnimating] = useState(false);
@@ -268,6 +270,10 @@ const Reel = ({ saveHistory }) => {
   }, [isAnimating]); // Depend on isAnimating to lock actions
 
   return (
+    <>
+    <div className="moneyBox absolute">
+    <PiCurrencyDollarSimpleBold />{money.toLocaleString()}
+    </div>
     <div className="reel relative">
       {/* Render the ReelGrid here */}
       <ReelGrid winningGridPositions={winningGridPositions} />
@@ -289,6 +295,7 @@ const Reel = ({ saveHistory }) => {
         </div>
       ))}
     </div>
+    </>
   );
 };
 

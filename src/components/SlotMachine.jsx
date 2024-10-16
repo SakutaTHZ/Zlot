@@ -32,6 +32,11 @@ const SlotMachine = () => {
           ))}
         </div>
 
+        <div className="lever">
+          <div className="rod">
+            <div className="ball"></div>
+          </div>
+        </div>
         <Reel saveHistory={saveHistory} />
       </div>
 
