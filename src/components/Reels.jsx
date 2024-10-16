@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import ReelGrid from "./ReelGrid";
 
 // Define custom paylines (indices of symbols in the paylines)
 const PAYLINES = [
@@ -20,79 +21,79 @@ const PAYLINES = [
 
   // Diagonal payline patterns
   {
-    name: "Diagonal (\\)",
+    name: "\\ Diagonal 1",
     pattern: [[0, 0], [1, 1], [2, 2]],
     multiplier: 20
   },
   {
-    name: "Diagonal (\\)",
+    name: "\\ Diagonal 2",
     pattern: [[0, 1], [1, 2], [2, 3]],
     multiplier: 20
   },
   {
-    name: "Diagonal (\\)",
+    name: "\\ Diagonal 3",
     pattern: [[0, 2], [1, 3], [2, 4]],
     multiplier: 20
   },
 
-  {
-    name: "Diagonal (/)",
+  { 
+    name: "/ Diagonal 1",
     pattern: [[0, 4], [1, 3], [2, 2]],
     multiplier: 20
   },
   {
-    name: "Diagonal (/)",
+    name: "/ Diagonal 2",
     pattern: [[0, 3], [1, 2], [2, 1]],
     multiplier: 20
   },
   {
-    name: "Diagonal (/)",
+    name: "/ Diagonal 3",
     pattern: [[0, 2], [1, 1], [2, 0]],
     multiplier: 20
   },
 
   // Cross patterns
   {
-    name: "X (1)",
+    name: "X 1",
     pattern: [[0, 0], [0, 2], [1, 1], [2, 0], [2, 2]],
     multiplier: 15
   },
   {
-    name: "X (2)",
+    name: "X 2",
     pattern: [[0, 1], [0, 3], [1, 2], [2, 1], [2, 3]],
     multiplier: 15
   },
   {
-    name: "X (3)",
+    name: "X 3",
     pattern: [[0, 2], [0, 4], [1, 3], [2, 2], [2, 4]],
     multiplier: 15
   },
 
   // V pattern
   {
-    name: "V pattern (1)",
+    name: "V",
     pattern: [[0, 0], [0, 4], [1, 1], [1, 3], [2, 2]],
     multiplier: 25
   },
   {
-    name: "Reverse V pattern (2)",
+    name: "^",
     pattern: [[0, 2], [1, 1], [1, 3], [2, 0], [2, 4]],
     multiplier: 25
   },
 
   // X pattern
   {
-    name: "+ (1)",
+    name: "+ 1",
     pattern: [[0, 1], [1, 0], [1, 1], [1, 2], [2, 1]],
     multiplier: 30
   },
   {
-    name: "+ pattern (2)",
+    name: "+ 2",
     pattern: [[0, 2], [1, 1], [1, 2], [1, 3], [2, 2]],
     multiplier: 30
   },
   {
-    name: "+ pattern (3)",
+    name: "+ 3",
     pattern: [[0, 3], [1, 2], [1, 3], [1, 4], [2, 3]],
     multiplier: 30
   },
@@ -131,10 +132,33 @@ const getCurrentTime = () => {
   return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
 };
 
+//Pity count
+const pityThreshold = 3;
 // Function to generate random symbols for the reels
-const randomizeSymbols = () => {
+const randomizeSymbols = (failCount) => {
   const symbols = ["🍒", "🍋", "🍇", "🔔", "⭐", "🍀"];
-  
+
+  if (failCount >= pityThreshold+1) {
+    console.log("Pity hit")
+    // Pick a random payline to guarantee a win
+    const randomPayline = PAYLINES[Math.floor(Math.random() * PAYLINES.length)];
+    
+    // Choose a random symbol for the winning payline
+    const winningSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+
+    // Generate symbols, making sure the selected payline has the winning symbol
+    return Array.from({ length: 5 }, (_, colIndex) => {
+      return Array.from({ length: 3 }, (_, rowIndex) => {
+        // Check if the current position is part of the winning payline
+        const isWinningPosition = randomPayline.pattern.some(([row, col]) => row === rowIndex && col === colIndex);
+        
+        // If it's a winning position, set it to the winning symbol
+        return isWinningPosition ? winningSymbol : symbols[Math.floor(Math.random() * symbols.length)];
+      });
+    });
+  }
+
+  // Otherwise, return random symbols
   return Array.from({ length: 5 }, () => {
     const finalSymbols = Array.from(
       { length: 3 },
@@ -152,7 +176,6 @@ const randomizeSymbols = () => {
 const checkWinCondition = (reels) => {
   const spinTime = getCurrentTime();
   const finalSymbols = reels.map((col) => col.slice(0, 3));
-  console.log(finalSymbols)
 
   if (!Array.isArray(reels) || !Array.isArray(reels[0])) {
     console.error("Error: reels is not a valid 2D array");
@@ -160,15 +183,16 @@ const checkWinCondition = (reels) => {
   }
 
   let paylinesHit = [];
+  let gridPositions = []; // Store positions of winning symbols
   let totalMultiplier = 0;
 
-  PAYLINES.forEach(({pattern,name, multiplier} ,index) => {
+  PAYLINES.forEach(({pattern,name, multiplier}) => {
     const symbolsInPayline = pattern.map(([row, col]) => finalSymbols[col][row]); // Extract symbols for this payline
-    console.log(symbolsInPayline+" "+name)
     // Check if all symbols in the payline are the same
     if (symbolsInPayline.every(symbol => symbol === symbolsInPayline[0])) {
       paylinesHit.push({ symbol: symbolsInPayline[0], name, multiplier }); // Add the symbol that formed the winning payline
       totalMultiplier += multiplier; // Sum the multipliers for the winning paylines
+      gridPositions.push(pattern); // Store the pattern for lighting
     }
   });
 
@@ -176,20 +200,23 @@ const checkWinCondition = (reels) => {
     isWin: paylinesHit.length > 0, // Win if any paylines were hit
     paylinesHit, // Return the hit paylines
     totalMultiplier, // Return the total multiplier for winnings
-    spinTime
+    spinTime,
+    gridPositions, // Return the grid positions for winning paylines
   };
 };
 
 const Reel = ({ saveHistory }) => {
-  const [reels, setReels] = useState(randomizeSymbols());
+  const [failCount,setFailCount] = useState(1);
+  const [reels, setReels] = useState(randomizeSymbols(failCount));
   const [isAnimating, setIsAnimating] = useState(false);
+  const [winningGridPositions, setWinningGridPositions] = useState([]); // State for winning grid positions
 
   // Function to regenerate symbols and trigger animation
   const regenerateSymbols = () => {
     if (isAnimating) return; // Prevent any actions during animation
-
+    setWinningGridPositions([]);
     setIsAnimating(false); // Reset animation state first
-    const newSymbols = randomizeSymbols(); // Generate new symbols
+    const newSymbols = randomizeSymbols(failCount); // Generate new symbols
     setReels(newSymbols);
 
     // Trigger animation after a short delay
@@ -202,8 +229,14 @@ const Reel = ({ saveHistory }) => {
       setIsAnimating(false); // Stop animation
 
       // Check for win conditions
-      const { isWin, paylinesHit, totalMultiplier,spinTime  } = checkWinCondition(newSymbols); // Pass newSymbols
-
+      const { isWin, paylinesHit,gridPositions, totalMultiplier,spinTime  } = checkWinCondition(newSymbols); // Pass newSymbols
+      if (!isWin) {
+        // Update failCount correctly
+        setFailCount((prevCount) => prevCount + 1);
+        console.log("Fail count - " + failCount); // This might still show an outdated value because state updates are async
+      }else{
+        setFailCount(1);
+      }
       // Save the result to history
       saveHistory({
         symbols: newSymbols,
@@ -212,6 +245,8 @@ const Reel = ({ saveHistory }) => {
         spinTime,
         totalMultiplier, // Save total multiplier for winnings
       });
+      // Set the winning grid positions for lighting up
+      setWinningGridPositions(gridPositions);
     }, 2500); // Duration of the animation
   };
 
@@ -234,28 +269,12 @@ const Reel = ({ saveHistory }) => {
 
   return (
     <div className="reel relative">
-      <div className="reelGrid absolute flex flex-wrap box-border h-full w-full z-40">
-        <div className="grid w-1/5 h-1/3 border"></div>
-        <div className="grid w-1/5 h-1/3 border"></div>
-        <div className="grid w-1/5 h-1/3 border"></div>
-        <div className="grid w-1/5 h-1/3 border"></div>
-        <div className="grid w-1/5 h-1/3 border"></div>
+      {/* Render the ReelGrid here */}
+      <ReelGrid winningGridPositions={winningGridPositions} />
 
-        <div className="grid w-1/5 h-1/3 border"></div>
-        <div className="grid w-1/5 h-1/3 border"></div>
-        <div className="grid w-1/5 h-1/3 border"></div>
-        <div className="grid w-1/5 h-1/3 border"></div>
-        <div className="grid w-1/5 h-1/3 border"></div>
-
-        <div className="grid w-1/5 h-1/3 border"></div>
-        <div className="grid w-1/5 h-1/3 border"></div>
-        <div className="grid w-1/5 h-1/3 border"></div>
-        <div className="grid w-1/5 h-1/3 border"></div>
-        <div className="grid w-1/5 h-1/3 border"></div>
-      </div>
       {reels.map((colSymbols, colIndex) => (
         <div
-          className={`col ${isAnimating ? "animating" : ""}`}
+          className={`z-20 col ${isAnimating ? "animating" : ""}`}
           style={{ animationDelay: `${colIndex * 0.5}s` }}
           key={colIndex}
         >
@@ -264,7 +283,7 @@ const Reel = ({ saveHistory }) => {
             style={{ animationDelay: `${colIndex * 0.2}s` }}
           >
             {colSymbols.map((symbol, symbolIndex) => (
-              <span key={symbolIndex}>{symbol}</span>
+              <span className="text-center drop-shadow-2xl" key={symbolIndex}>{symbol}</span>
             ))}
           </div>
         </div>
