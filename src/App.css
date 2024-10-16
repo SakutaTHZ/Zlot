@@ -4,6 +4,32 @@
   --lightColor: #7cf5ff;
 }
 
+*::-webkit-scrollbar {
+  height: 10px;
+  width: 5px;
+}
+*::-webkit-scrollbar-track {
+  border-radius: 5px;
+  background-color: transparent;
+}
+
+*::-webkit-scrollbar-track:hover {
+  background-color: var(--background);
+}
+
+*::-webkit-scrollbar-track:active {
+  background-color: var(--background);
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 20px;
+  background-color: var(--boxColor);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--boxColor);
+}
+
 .slotMachine {
   position: relative;
   display: flex;
@@ -134,6 +160,7 @@
     background: var(--backgroundColor);
     overflow: hidden;
     .col {
+      position:relative;
       padding-top: 3px;
       width: calc(100% / 5);
       height: 100%;
@@ -149,15 +176,28 @@
       }
 
       .colData {
+        position:relative;
         display: flex;
         flex-direction: column;
         align-items: center;
-        transform: translateY(calc(-90% + 15px));
       }
       .colData.animating{
         animation: rollUp 1s ease-in-out reverse;
         animation-fill-mode: forwards;
       }
+    }
+    
+    .col::before{
+      content:'';
+      position:absolute;
+      width:100%;
+      transform:translateY(-10px);
+      background: linear-gradient(var(--backgroundColor),transparent,var(--backgroundColor) );
+      z-index:10;
+      transition:3s linear;
+    }
+    .col.animating::before{
+      animation: blindOpen 2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
     }
   }
 }
@@ -183,6 +223,15 @@
   }
 }
 
+@keyframes blindOpen{
+  from{
+    height:120%;
+    backdrop-filter:blur(20px);
+  }to{
+    height:120%;
+    backdrop-filter:blur(0px);
+  }
+}
 @keyframes lightUpBulb {
   0% {
     filter: hue-rotate(0deg);
@@ -211,11 +260,11 @@
 @keyframes rollUp {
   0% {
     opacity: 1;
-    transform: translateY(calc(-90%+15px)); /* Start at the bottom (last symbol) */
+    transform: translateY(0); /* End at the first 3 symbols */
   }
   100% {
     opacity: 0;
-    transform: translateY(0); /* End at the first 3 symbols */
+    transform: translateY(calc(-90%+15px)); /* Start at the bottom (last symbol) */
   }
 }
 
