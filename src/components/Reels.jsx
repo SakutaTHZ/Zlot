@@ -360,7 +360,6 @@ const Reel = forwardRef(({ saveHistory }, ref) => {
         // Update failCount correctly using functional setState
         setFailCount((prevCount) => {
           const newCount = isWin ? 1 : prevCount + 1;
-          console.log("Fail count - " + newCount);
           return newCount;
         });
 

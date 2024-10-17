@@ -318,12 +318,84 @@
   padding:20px;
   background:var(--backgroundColor);
   transform: scaleX(1) scaleY(1) scaleZ(1) rotateX(30deg) rotateY(0deg) rotateZ(0deg) translateX(0px) translateY(0px) translateZ(0px) skewX(0deg) skewY(0deg);
+
+  button{
+    font-size:1.1em;
+    border:.5px solid var(--lightColor);
+    color:white;
+    background: linear-gradient(in lch,var(--backgroundColor),var(--boxColor));
+    transform: perspective(5cm) rotateX(10deg) rotateY(0deg) rotateZ(0deg) translateZ(0px);
+    box-shadow: 0 5px var(--lightColor);
+    animation: rgb 5s linear infinite;
+    border-radius:10px;
+    transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .betBox{
+    button{
+      box-shadow: 2px 5px var(--lightColor);
+    }
+  }.spinBox{
+    button{
+      box-shadow: -2px 5px var(--lightColor);
+    }
+  }
+  button:focus {
+    outline: none;
+  }
+  button:active{
+    outline:none;
+    transform: perspective(10cm) rotateX(10deg) rotateY(0deg) rotateZ(0deg) translateZ(-25px);
+    box-shadow: 0 1px var(--lightColor);
+  }
 }
 .cube-wrap {
   top:95%;
   position:absolute;
   perspective: 200px;
   perspective-origin: 50% 50%;
+  display:flex;
+  justify-content:flex-start;
+}
+.dataBox{
+  border:5px solid var(--backgroundColor);
+  color:var(--lightColor); 
+  border-radius:10px;
+  background:hsl(from var(--boxColor) h s l / .2);
+  position:absolute;
+  top:5px;
+  backdrop-filter:blur(5px);
+  padding:3px 8px;
+  z-index:10;
+  width:30%;
+  display:flex;
+  justify-content:between;
+  gap:5px;
+  input{
+    border-radius:5px;
+  }
+  input:hover{
+    background:hsl(from var(--backgroundColor) h s l / 1);
+  }input:focus{
+    outline:none;
+    background:hsl(from var(--backgroundColor) h s l / 1);
+  }
+}
+.bet-dataBox{
+  left:7.5%;
+}.spin-dataBox{
+  right:7.5%;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 
 @keyframes blindOpen {
