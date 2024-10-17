@@ -100,7 +100,7 @@ const SlotMachine = () => {
 
   return (
     <>
-      <div className="slotMachine">
+      <div className="slotMachine scale-75 md:scale-100">
         <div className="lights leftLights">
           {Array.from({ length: 10 }, (_, index) => (
             <span
