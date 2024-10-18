@@ -13,6 +13,7 @@ const History = ({ history }) => {
 
   return (
     <div className="history flex flex-col gap-2 py-2">
+      <h1 className="text-2xl pb-2">History</h1>
       {/* Filter Buttons */}
       <div className="historyFilters flex justify-between gap-2 mb-2 text-neutral-100">
         <button

@@ -11,7 +11,7 @@ function App() {
   checkData()
   
   return (
-    <section className='w-screen h-screen flex justify-center items-center'>
+    <section className='gameScreen flex justify-center items-center'>
       <SlotMachine/>
     </section>
   )

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { MdKeyboardTab, MdHistoryEdu, MdClose } from "react-icons/md";
+import { MdKeyboardTab, MdClose } from "react-icons/md";
+import { TbSettings2 } from "react-icons/tb";
 
-const StatusNav = ({ children }) => {
+const ProfileNav = ({ children }) => {
   const [isClosed, setIsClosed] = useState(true);
 
   useEffect(() => {
@@ -21,9 +22,9 @@ const StatusNav = ({ children }) => {
 
   return (
     <div
-      className={`statusNav ${
+      className={`profileNav ${
         isClosed ? "closed" : ""
-      } fixed left-0 top-0 w-full md:w-96 h-screen  z-50`}
+      } fixed right-0 top-0 w-full md:w-96 h-screen z-50`}
     >
       {/* Render children (History component) */}
       <div className="history-container h-full px-5 overflow-y-scroll">
@@ -37,11 +38,11 @@ const StatusNav = ({ children }) => {
           className="cursor-pointer"
           onClick={() => setIsClosed((prev) => !prev)}
         >
-          {isClosed ? <MdHistoryEdu size={25} /> : <MdClose size={25} />}
+          {isClosed ? <TbSettings2  size={25} /> : <MdClose size={25} />}
         </span>
       </div>
     </div>
   );
 };
 
-export default StatusNav;
+export default ProfileNav;

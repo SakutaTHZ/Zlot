@@ -2,7 +2,9 @@ import React, { useEffect, useState, useRef } from "react";
 import Reel from "./Reels";
 import History from "./History";
 import StatusNav from "./StatusNav";
+import ProfileNav from "./ProfileNav";
 import { CgSpinner } from "react-icons/cg";
+import ThemeBox from "./ThemeBox";
 
 const SlotMachine = () => {
   const [history, setHistory] = useState([]);
@@ -93,7 +95,7 @@ const SlotMachine = () => {
 
   return (
     <>
-      <div className="slotMachine scale-75 md:scale-100">
+      <div className="slotMachine default scale-75 md:scale-100">
         <div className="lights leftLights">
           {Array.from({ length: 10 }, (_, index) => (
             <span
@@ -208,6 +210,10 @@ const SlotMachine = () => {
       <StatusNav>
         <History history={history} />
       </StatusNav>
+
+      <ProfileNav>
+        <ThemeBox/>
+      </ProfileNav>
     </>
   );
 };
