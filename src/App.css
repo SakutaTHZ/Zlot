@@ -160,8 +160,9 @@
     width: 80%;
     height: auto;
     height: 200px;
-    background: var(--backgroundColor);
     overflow: hidden;
+    border: 2px solid transparent;
+    transition: .5s ease-in-out;
     .col {
       position: relative;
       padding-top: 3px;
@@ -206,6 +207,17 @@
     .col.animating::before {
       animation: blindOpen 2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
     }
+  }
+}
+
+.reel.lose{
+  animation: pulsing 3s linear infinite alternate;
+}
+@keyframes pulsing {
+  from{
+    box-shadow: inset 0 0 0px rgba(255, 0, 0, 0.1);
+  }to{
+    box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.1);
   }
 }
 
@@ -494,7 +506,10 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
-
+.messageBox{
+  background: var(--backgroundColor);
+  animation-fill-mode: forwards;
+}
 @keyframes blindOpen {
   from {
     height: 120%;

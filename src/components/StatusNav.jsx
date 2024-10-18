@@ -20,7 +20,7 @@ const StatusNav = ({children}) => {
   }, []);
 
   return (
-    <div className={`statusNav ${isClosed ? "closed" : ""} fixed left-0 top-0 w-full md:w-80 h-screen bg-neutral-800 shadow-md z-50`}>
+    <div className={`statusNav ${isClosed ? "closed" : ""} fixed left-0 top-0 w-full md:w-96 h-screen bg-neutral-800 shadow-md z-50`}>
         {/* Render children (History component) */}
       <div className="history-container h-full px-5 overflow-y-scroll">
         {children}

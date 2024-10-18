@@ -7,6 +7,7 @@ import React, {
 import ReelGrid from "./ReelGrid";
 import { PiCurrencyDollarSimpleBold } from "react-icons/pi";
 import confetti from "canvas-confetti";
+import MessageBox from "./MessageBox";
 
 const PAYLINES = [
   {
@@ -251,7 +252,7 @@ const shootConfetti = (winSymbol) => {
   var winSyms = [];
   winSymbol.forEach((element) => {
     var symbol = confetti.shapeFromText({ text: element.symbol, scalar });
-    winSyms.push(symbol)
+    winSyms.push(symbol);
   });
 
   var defaults = {
@@ -289,7 +290,7 @@ const shootConfetti = (winSymbol) => {
   setTimeout(shoot, 200);
 };
 
-const pityThreshold = 0;
+const pityThreshold = 30;
 
 const randomizeSymbols = (failCount) => {
   const symbols = ["🍒", "🍋", "🍇", "🔔", "⭐", "🍀"];
@@ -365,9 +366,24 @@ const Reel = forwardRef(({ saveHistory, bet }, ref) => {
   const [reels, setReels] = useState(randomizeSymbols(failCount));
   const [isAnimating, setIsAnimating] = useState(false);
   const [winningGridPositions, setWinningGridPositions] = useState([]);
+  const [message, setMessage] = useState("");
+  const [isLose, setIsLose] = useState(false);
+
+  useEffect(() => {
+    if (message) {
+      console.log(message);
+    }
+  }, [message]);
 
   useImperativeHandle(ref, () => ({
     regenerateSymbols() {
+      if (money - bet < 0) {
+        setMessage(() => "Insufficient Balance");
+        return;
+      } else {
+        setMessage(() => "");
+      }
+      console.log("Check Balance - " + (money - bet));
       triggerLeverClick();
       if (isAnimating) return;
       setWinningGridPositions([]);
@@ -390,6 +406,10 @@ const Reel = forwardRef(({ saveHistory, bet }, ref) => {
         isWin
           ? setMoney((prev) => prev + bet * totalMultiplier)
           : setMoney((prev) => prev - bet);
+
+          isWin
+          ? setIsLose(false)
+          : setIsLose(true)
 
         const newAmount = isWin ? money + bet * totalMultiplier : money - bet;
         localStorage.setItem("money", newAmount);
@@ -434,11 +454,19 @@ const Reel = forwardRef(({ saveHistory, bet }, ref) => {
 
   return (
     <>
+      <MessageBox
+        customClass={`${message === "" && "hidden"}`}
+        messageText={message}
+      />
       <div className="moneyBox absolute text-white">
         <PiCurrencyDollarSimpleBold />
         {money.toLocaleString()}
       </div>
-      <div className="reel relative">
+      <div
+        className={`reel relative bg-neutral-900 ${
+          isLose && !isAnimating ? "lose" : ""
+        }`}
+      >
         {/* Render the ReelGrid here */}
         <ReelGrid winningGridPositions={winningGridPositions} />
 

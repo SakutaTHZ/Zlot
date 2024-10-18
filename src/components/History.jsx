@@ -16,7 +16,7 @@ const History = ({ history }) => {
       {/* Filter Buttons */}
       <div className="historyFilters flex justify-between gap-2 mb-2 text-neutral-100">
         <button
-          className={`w-full py-1 px-3 flex justify-between ${
+          className={`w-full py-1 px-3 flex justify-between gap-1 ${
             filter === "all"
               ? "bg-neutral-700 text-white"
               : "bg-transparent border border-neutral-700"
@@ -26,7 +26,7 @@ const History = ({ history }) => {
           All <span className="allCount">{history.length}</span>
         </button>
         <button
-          className={`w-full py-1 px-3 flex justify-between ${
+          className={`w-full py-1 px-3 flex justify-between gap-1 ${
             filter === "wins"
               ? "bg-green-500 text-green-500 bg-opacity-10"
               : "bg-transparent border border-neutral-700"
@@ -40,7 +40,7 @@ const History = ({ history }) => {
         </button>
 
         <button
-          className={`w-full py-1 px-3 flex justify-between ${
+          className={`w-full py-1 px-3 flex justify-between gap-1 ${
             filter === "losses"
               ? "bg-red-500 text-red-500 bg-opacity-10"
               : "bg-transparent border border-neutral-700"
@@ -59,7 +59,7 @@ const History = ({ history }) => {
         .reverse()
         .map((spin, spinIndex) => (
           <div
-            className="flex flex-col gap-1 border-b pb-4 border-b-neutral-700"
+            className="historyBlock flex flex-col gap-1 border-b pb-4 border-b-neutral-700"
             key={spinIndex}
           >
             <strong className="flex  justify-between text-neutral-400 mb-2">
@@ -130,7 +130,7 @@ const History = ({ history }) => {
                     ? <FaCaretUp className="text-green-500"/>
                     : 
                     <FaCaretDown className="text-red-500"/>}
-                  {spin.totalMoney}
+                  $ {spin.totalMoney.toLocaleString()}
                 </span>
               </p>
             </div>
