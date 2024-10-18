@@ -6,6 +6,7 @@ import React, {
 } from "react";
 import ReelGrid from "./ReelGrid";
 import { PiCurrencyDollarSimpleBold } from "react-icons/pi";
+import confetti from "canvas-confetti";
 
 const PAYLINES = [
   {
@@ -245,7 +246,50 @@ const getCurrentTime = () => {
   });
 };
 
-const pityThreshold = 30;
+const shootConfetti = (winSymbol) => {
+  var scalar = 2;
+  var winSyms = [];
+  winSymbol.forEach((element) => {
+    var symbol = confetti.shapeFromText({ text: element.symbol, scalar });
+    winSyms.push(symbol)
+  });
+
+  var defaults = {
+    spread: 360,
+    ticks: 60,
+    gravity: 0,
+    decay: 0.96,
+    startVelocity: 20,
+    shapes: winSyms,
+    scalar,
+  };
+
+  function shoot() {
+    confetti({
+      ...defaults,
+      particleCount: 30,
+    });
+
+    confetti({
+      ...defaults,
+      particleCount: 5,
+      flat: true,
+    });
+
+    confetti({
+      ...defaults,
+      particleCount: 15,
+      scalar: scalar / 2,
+      shapes: ["circle"],
+    });
+  }
+
+  setTimeout(shoot, 0);
+  setTimeout(shoot, 100);
+  setTimeout(shoot, 200);
+};
+
+const pityThreshold = 0;
 
 const randomizeSymbols = (failCount) => {
   const symbols = ["🍒", "🍋", "🍇", "🔔", "⭐", "🍀"];
@@ -347,9 +391,9 @@ const Reel = forwardRef(({ saveHistory, bet }, ref) => {
           ? setMoney((prev) => prev + bet * totalMultiplier)
           : setMoney((prev) => prev - bet);
 
-        const newAmount = isWin ? money + bet * totalMultiplier : money - bet
-        localStorage.setItem("money",newAmount)
-        
+        const newAmount = isWin ? money + bet * totalMultiplier : money - bet;
+        localStorage.setItem("money", newAmount);
+
         saveHistory({
           symbols: newSymbols,
           result: isWin ? "Win" : "Lose",
@@ -359,7 +403,7 @@ const Reel = forwardRef(({ saveHistory, bet }, ref) => {
           bet,
           totalMoney: newAmount,
         });
-
+        isWin && shootConfetti(paylinesHit);
         setWinningGridPositions(gridPositions);
       }, 2500);
     },
