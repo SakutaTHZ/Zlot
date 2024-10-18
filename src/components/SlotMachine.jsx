@@ -5,96 +5,89 @@ import StatusNav from "./StatusNav";
 import { CgSpinner } from "react-icons/cg";
 
 const SlotMachine = () => {
-  const [history, setHistory] = useState([]); // Manage the history state
-  const reelRef = useRef(null); // Create a ref for the Reel component
+  const [history, setHistory] = useState([]);
+  const reelRef = useRef(null);
 
   const [autoSpinning, setAutoSpinning] = useState(false);
-  const [totalSpinCount, setTotalSpinCount] = useState(11); // Tracks total spins
-  const [spinCount, setSpinCount] = useState(0); // Tracks the current auto-spin count
-  const intervalRef = useRef(null); // Use ref to store the interval ID
+  const [totalSpinCount, setTotalSpinCount] = useState(10);
+  const [spinCount, setSpinCount] = useState(0);
+  const intervalRef = useRef(null);
 
-  // Function to start auto-spin
+  const [bet, setBet] = useState(1);
+
   const startAutoSpin = () => {
-    {autoSpinning ? (
-      setAutoSpinning(false)
-    ):(
-      setAutoSpinning(true)
-    )}
-    setSpinCount(0); // Reset the spin count when starting auto-spin
+    {
+      autoSpinning ? setAutoSpinning(false) : setAutoSpinning(true);
+    }
+    setSpinCount(0);
   };
 
-  // Function to stop auto-spin
   const stopAutoSpin = () => {
     setAutoSpinning(false);
-    clearInterval(intervalRef.current); // Clear the interval when stopping
+    clearInterval(intervalRef.current);
     intervalRef.current = null;
   };
 
-  // Function to handle auto-spin logic
   const handleAutoSpin = () => {
     intervalRef.current = setInterval(() => {
       handleLeverClick();
 
       setSpinCount((spinCount) => {
-        // Stop auto-spin after a certain number of spins
         if (spinCount + 1 >= totalSpinCount) {
           stopAutoSpin();
-          return 0; // Reset spin count when auto-spin stops
+          return 0;
         }
-        return spinCount + 1; // Increment spin count
+        return spinCount + 1;
       });
-    }, 4000); // Spin every 4 seconds
+    }, 4000);
   };
 
-  // Function to add to total spin count
   const calculateTotalSpinCount = (amount) => {
-    setTotalSpinCount((prevTotal) => prevTotal + amount);
+    console.log(amount + totalSpinCount);
+    if (amount + totalSpinCount >= 1) {
+      setTotalSpinCount((prevTotal) => prevTotal + amount);
+    }
   };
 
-  // Log the updated totalSpinCount
-  useEffect(() => {
-    console.log("Total Spin Count updated:", totalSpinCount);
-  }, [totalSpinCount]); // This will trigger whenever totalSpinCount changes
+  const calculateTotalBetCount = (amount) => {
+    console.log(amount + bet);
+    if (amount + bet >= 1) {
+      setBet((prevTotal) => prevTotal + amount);
+    }
+  };
+
+  useEffect(() => {}, [totalSpinCount]);
 
   useEffect(() => {
     if (autoSpinning) {
-      console.log("Auto spinning started...");
-      handleAutoSpin(); // Call the function to start auto-spinning
+      handleAutoSpin();
     }
 
-    // Cleanup function to clear the interval if the component unmounts
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
     };
-  }, [autoSpinning]); // Depend only on autoSpinning to control the spinning
+  }, [autoSpinning]);
 
-  // Load history from local storage on component mount
   useEffect(() => {
     const storedHistory = JSON.parse(localStorage.getItem("slotHistory")) || [];
     setHistory(storedHistory);
   }, []);
 
-  // Function to save history and store the latest 30 in local storage
   const saveHistory = (symbols) => {
     setHistory((prevHistory) => {
       const updatedHistory = [...prevHistory, symbols];
 
-      // Limit history to the latest 30 entries
-      //const limitedHistory = updatedHistory.slice(-30);
-
-      // Save the updated history to local storage
       localStorage.setItem("slotHistory", JSON.stringify(updatedHistory));
 
       return updatedHistory;
     });
   };
 
-  // Lever click handler
   const handleLeverClick = () => {
     if (reelRef.current) {
-      reelRef.current.regenerateSymbols(); // Trigger regenerateSymbols in the Reel component
+      reelRef.current.regenerateSymbols();
     }
   };
 
@@ -125,17 +118,18 @@ const SlotMachine = () => {
             <div className="ball"></div>
           </div>
         </div>
-        <Reel ref={reelRef} saveHistory={saveHistory} />
+        <Reel ref={reelRef} saveHistory={saveHistory} bet={bet} />
 
         <div className="cube-wrap">
           <div className="dataBox bet-dataBox flex">
             <span className="text-white text-nowrap">Your Bet - </span>{" "}
             <input
               type="number"
-              value={10}
+              value={bet}
               placeholder="10"
               className="bg-transparent w-full text-white px-2"
-              onChange={(e) => setTotalSpinCount(Number(e.target.value))}
+              onChange={(e) => setBet(Number(e.target.value))}
+              min="1"
             />
           </div>
           <div className="dataBox spin-dataBox flex">
@@ -146,6 +140,7 @@ const SlotMachine = () => {
               placeholder="10"
               className="bg-transparent w-full text-white px-2"
               onChange={(e) => setTotalSpinCount(Number(e.target.value))}
+              min="1"
             />
           </div>
           <div className="cube flex justify-center items-center gap-5">
@@ -153,11 +148,13 @@ const SlotMachine = () => {
               <div className="flex justify-between gap-3 h-8">
                 <button
                   className="flex justify-center items-center w-full"
+                  onClick={() => calculateTotalBetCount(1)}
                 >
                   +
                 </button>
                 <button
                   className="flex justify-center items-center w-full"
+                  onClick={() => calculateTotalBetCount(-1)}
                 >
                   -
                 </button>
@@ -171,8 +168,12 @@ const SlotMachine = () => {
               <span className={`${autoSpinning ? "hidden" : "block"}`}>
                 Auto Spin
               </span>
-              <span className={`absolute text-sm ${autoSpinning ? "block" : "hidden"}`}>
-                {totalSpinCount-spinCount}
+              <span
+                className={`absolute text-sm ${
+                  autoSpinning ? "block" : "hidden"
+                }`}
+              >
+                {totalSpinCount - spinCount}
               </span>
               <span>
                 <CgSpinner
@@ -186,12 +187,16 @@ const SlotMachine = () => {
 
             <div className="spinBox w-4/12 flex flex-col gap-1">
               <div className="flex justify-between gap-3 h-8">
-                <button className="flex justify-center items-center w-full"
-                  onClick={() => calculateTotalSpinCount(1)}>
+                <button
+                  className="flex justify-center items-center w-full"
+                  onClick={() => calculateTotalSpinCount(1)}
+                >
                   +
                 </button>
-                <button className="flex justify-center items-center w-full"
-                  onClick={() => calculateTotalSpinCount(-1)}>
+                <button
+                  className="flex justify-center items-center w-full"
+                  onClick={() => calculateTotalSpinCount(-1)}
+                >
                   -
                 </button>
               </div>

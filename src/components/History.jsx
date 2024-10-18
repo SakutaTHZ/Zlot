@@ -1,28 +1,27 @@
 import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
+import { FaCaretUp, FaCaretDown } from "react-icons/fa";
 
 const History = ({ history }) => {
-  const [filter, setFilter] = useState("all"); // Track the active filter ("all", "wins", or "losses")
+  const [filter, setFilter] = useState("all");
 
-  // Function to filter the history based on the active filter
   const filteredHistory = history.filter((spin) => {
     if (filter === "wins") return spin.result === "Win";
     if (filter === "losses") return spin.result === "Lose";
-    return true; // Show all spins if no filter is active
+    return true;
   });
 
   return (
     <div className="history flex flex-col gap-2 py-2">
       {/* Filter Buttons */}
       <div className="historyFilters flex justify-between gap-2 mb-2 text-neutral-100">
-        {/* Show all button */}
         <button
           className={`w-full py-1 px-3 flex justify-between ${
             filter === "all"
               ? "bg-neutral-700 text-white"
               : "bg-transparent border border-neutral-700"
           }`}
-          onClick={() => setFilter("all")} // Set filter to "all"
+          onClick={() => setFilter("all")}
         >
           All <span className="allCount">{history.length}</span>
         </button>
@@ -32,7 +31,7 @@ const History = ({ history }) => {
               ? "bg-green-500 text-green-500 bg-opacity-10"
               : "bg-transparent border border-neutral-700"
           }`}
-          onClick={() => setFilter("wins")} // Set filter to "wins"
+          onClick={() => setFilter("wins")}
         >
           Wins{" "}
           <span className="winCount">
@@ -46,7 +45,7 @@ const History = ({ history }) => {
               ? "bg-red-500 text-red-500 bg-opacity-10"
               : "bg-transparent border border-neutral-700"
           }`}
-          onClick={() => setFilter("losses")} // Set filter to "losses"
+          onClick={() => setFilter("losses")} 
         >
           Loses{" "}
           <span className="loseCount">
@@ -55,13 +54,12 @@ const History = ({ history }) => {
         </button>
       </div>
 
-      {/* Reverse and map the filtered history */}
       {filteredHistory
         .slice()
         .reverse()
         .map((spin, spinIndex) => (
           <div
-            className="flex flex-col gap-1 border-b pb-2 border-b-neutral-700"
+            className="flex flex-col gap-1 border-b pb-4 border-b-neutral-700"
             key={spinIndex}
           >
             <strong className="flex  justify-between text-neutral-400 mb-2">
@@ -99,7 +97,7 @@ const History = ({ history }) => {
 
             {/* Display Paylines Hit */}
             <div className="flex flex-col text-neutral-300">
-              <div className=" p-2">
+              <div className="p-2 py-1">
                 {spin.paylinesHit.length > 0 && (
                   <>
                     {spin.paylinesHit.map((payLine, payLineIndex) => (
@@ -116,13 +114,25 @@ const History = ({ history }) => {
                         </span>
                       </p>
                     ))}
-                    <p className="mt-2 border-t py-1 w-full flex justify-between font-semibold">
-                      <span className="pl-1">Total</span>
-                      <span className="flex items-center gap-1">1000</span>
-                    </p>
                   </>
                 )}
               </div>
+            </div>
+            <div className="px-4 bg-neutral-700 bg-opacity-50 rounded-md">
+              <p className="py-1 w-full flex justify-between font-semibold">
+                <span className="pl-1">Bet</span>
+                <span className="flex items-center gap-1">{spin.bet}</span>
+              </p>
+              <p className="py-1 w-full flex justify-between font-semibold">
+                <span className="pl-1">Total</span>
+                <span className="flex items-center gap-1">
+                  {spin.result === "Win"
+                    ? <FaCaretUp className="text-green-500"/>
+                    : 
+                    <FaCaretDown className="text-red-500"/>}
+                  {spin.totalMoney}
+                </span>
+              </p>
             </div>
           </div>
         ))}
